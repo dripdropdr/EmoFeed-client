@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
+import axios from 'axios';
 import React from 'react';
 // import './App.css';
 
@@ -34,10 +35,13 @@ function App() {
 const captureFrame = () => {
   if (!webcamActive) return;
 
+  // 웹캠의 현재 프레임을 캡처하여 canvas에 그립니다
   const canvas = document.createElement("canvas");
   canvas.getContext("2d").drawImage(videoRef.current, 0, 0);
+  // 캔버스의 내용을 JPEG 형식의 Base64 데이터 URL로 변환합니다.
   const dataURL = canvas.toDataURL("image/jpeg");
   
+  // Base64 인코딩된 이미지 데이터를 서버에 POST 요청으로 전송합니다.
   fetch("/capture", {
     method: "POST",
     headers: {
@@ -45,13 +49,10 @@ const captureFrame = () => {
     },
     body: JSON.stringify({ image: dataURL })
   })
-  .then(response => {
-    console.log(response);  // 응답 로깅
-    return response.blob();
-  })
-  .then(blob => {
-    const imageUrl = URL.createObjectURL(blob);
-    processedImgRef.current.src = imageUrl;
+  .then(response => response.text())  // Base64 문자열로 응답을 받아옵니다.
+  .then(base64Image => {
+    console.log(base64Image)
+    processedImgRef.current.src = `data:image/jpeg;base64,${base64Image}`;
   });
 };
   

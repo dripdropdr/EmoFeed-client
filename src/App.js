@@ -5,6 +5,9 @@ import React from 'react';
 
 function App() {
   const flaskEndpoint = "http://127.0.0.1:5000/webcam";
+  const analysisEndpoint = "http://127.0.0.1:5000/webcam_analysis";
+
+  
 
     return (
         <div>

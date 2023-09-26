@@ -36,3 +36,24 @@
     transform: rotate(360deg);
   }
 }
+
+
+.speech-bubble {
+	position: relative;
+	background: #a423be;
+	border-radius: .4em;
+}
+
+.speech-bubble:after {
+	content: '';
+	position: absolute;
+	right: 0;
+	top: 50%;
+	width: 0;
+	height: 0;
+	border: 20px solid transparent;
+	border-left-color: #a423be;
+	border-right: 0;
+	margin-top: -20px;
+	margin-right: -20px;
+}

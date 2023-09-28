@@ -18,7 +18,6 @@ function App() {
 export default App; */
 
 
-
 import React, { useEffect, useState } from 'react';
 import './App.css';
 
@@ -49,16 +48,21 @@ function App() {
       <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '100%'}}>
         <div style={{marginLeft: '20px'}}>
           <h1>WebCam Stream</h1>
-          <h2 style={{ fontSize: 'calc(1em - 3pt)' }}>App.css 파일 이용해서 디자인 다듬고, 다음 페이지 만들어서 레포트 관련 라이브러리 적용</h2>
         </div>
 
-        <div class="speech-bubble" style={{ width: '300px', height: '144px', position: 'absolute', top: '24px', right: '200px' }}>
+        <div class="speech-bubble" style={{ width: '400px', height: '144px', 
+          position: 'absolute', top: '20px', right: '200px', 
+          borderRadius: '15px',
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center' // 텍스트를 수직, 수평 중앙에 배치
+         }}>
           <h1 style={{fontSize}}>{text}</h1>
         </div>
 
         <div style={{
           position: 'absolute',
-          top: '20px',
+          top: '16px',
           right: '20px',
           width: '150px',
           height: '150px',
@@ -68,7 +72,21 @@ function App() {
         </div>
       </div>
 
-      <img src={flaskEndpoint} alt="Webcam Stream" style={{ width: '60%', height: 'auto', marginTop: '60px', marginBottom: '40px' }} />
+      <div style={{
+        display: 'flex',
+        width: '100%',
+        marginTop: '82px',
+        backgroundColor: '#262626', // grey background
+      }}>
+        <div style={{ 
+          width: '65%', 
+          paddingTop: '36.5625%', // 16:9 ratio 
+          position: 'relative',
+          margin: 'auto'  // Centers the video in the grey background div
+        }}>
+          <img src={flaskEndpoint} alt="Webcam Stream" style={{ position: 'absolute', top: '0', left: '0', width: '100%', height: '100%', objectFit: 'contain' }} />
+        </div>
+      </div>
     </div>
   );
 }

@@ -40,8 +40,8 @@
 
 .speech-bubble {
 	position: relative;
-	background: #a423be;
-	border-radius: .4em;
+	background: #fee486;
+	border-radius: 36px;
 }
 
 .speech-bubble:after {
@@ -51,9 +51,9 @@
 	top: 50%;
 	width: 0;
 	height: 0;
-	border: 20px solid transparent;
-	border-left-color: #a423be;
+	border: 16px solid transparent;
+	border-left-color: #fee486;
 	border-right: 0;
-	margin-top: -20px;
-	margin-right: -20px;
+	margin-top: -16px;
+	margin-right: -16px;
 }

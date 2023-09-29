@@ -1,28 +1,18 @@
-/*import React from 'react';
-
-function Dashboard() {
-  return (
-    <div>
-      <h1>대시보드 내용</h1>
-    </div>
-  );
-}
-export default Dashboard;
-*/
-
-
 import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import * as am4core from "@amcharts/amcharts4/core";
 import * as am4charts from "@amcharts/amcharts4/charts";
 
 function Dashboard() {
+    const Endpoint = "http://127.0.0.1:5000/new_endpoint"
     const chartRef = useRef(null);
     const [chart, setChart] = useState(null);
 
     useEffect(() => {
+        if (!chartRef.current) return;
         let x = am4core.create(chartRef.current, am4charts.XYChart);
         x.paddingRight = 20;
+        x.background.fill = am4core.color("#ffffff");
 
         let dateAxis = x.xAxes.push(new am4charts.DateAxis());
         dateAxis.renderer.grid.template.location = 0;
@@ -33,26 +23,28 @@ function Dashboard() {
         valueAxis.renderer.minWidth = 35;
         valueAxis.title.text = "Value";
 
-        // Here, create the createSeries function
-        function createSeries(name) {
+        function createSeries(name, color) {
             let series = x.series.push(new am4charts.LineSeries());
             series.dataFields.dateX = "date";
             series.dataFields.valueY = name;
             series.name = name;
+            series.stroke = am4core.color(color); // line color
             series.tooltipText = `{name}: [bold]{valueY}[/]`;
             series.showOnInit = true;
             return series;
         }
 
-        // 모든 감정과 drowsiness에 대한 시리즈를 생성합니다.
-        createSeries("drowsiness");
-        createSeries("neutral");
-        createSeries("anger");
-        createSeries("disgust");
-        createSeries("fear");
-        createSeries("happiness");
-        createSeries("sadness");
-        createSeries("surprise");
+        createSeries("drowsiness", "#FF0000"); // 각각의 시리즈에 대해 원하는 색상을 지정할 수 있습니다.
+        createSeries("neutral", "#0000FF");
+        createSeries("anger", "#00FF00");
+        createSeries("disgust", "#FFFF00");
+        createSeries("fear", "#FF00FF");
+        createSeries("happiness", "#00FFFF");
+        createSeries("sadness", "#000000");
+        createSeries("surprise", "#888888");
+
+        x.legend = new am4charts.Legend(); // 범례 추가
+        x.legend.position = "right"; // 범례의 위치를 차트의 우측에 설정
 
         setChart(x);
 
@@ -65,25 +57,27 @@ function Dashboard() {
         if (chart) {
             const fetchData = async () => {
                 try {
-                    const response = await axios.get('http://127.0.0.1:5000/new_endpoint'); // 주소를 업데이트했습니다.
-                    const data = response.data;
-                    const newData = {
-                        date: new Date(data.timestamp), // timestamp를 사용하여 date 객체를 생성합니다.
-                        drowsiness: data.drowsiness,
-                        ...data.emotions // 나머지 감정들도 펼쳐서 객체에 추가합니다.
-                    };
-                    chart.addData(newData);
+                    const response = await axios.get(Endpoint);
+                    if (response.status === 200) {
+                        const { drowsiness, emotions } = response.data; // destructuring을 사용하여 drowsiness와 emotions를 추출
+                        const newData = {
+                            date: new Date(), // Using current Date
+                            drowsiness: drowsiness, // drowsiness를 직접 매핑
+                            ...emotions // emotions 객체를 spread
+                        };
+                        chart.addData(newData);
+                    }
                 } catch (error) {
                     console.error("Error fetching the webcam analysis data", error);
                 }
             };
-            const interval = setInterval(fetchData, 3000); // 3초마다 데이터를 가져옵니다.
-            return () => clearInterval(interval); // 컴포넌트가 언마운트될 때 인터벌을 정리합니다.
+            const interval = setInterval(fetchData, 3000); // Fetch data every 3 seconds
+            return () => clearInterval(interval); // Clear interval when component unmounts
         }
     }, [chart]);
 
-
     return <div id="chartdiv" ref={chartRef} style={{ width: "100%", height: "500px" }} />;
 }
+
 
 export default Dashboard;

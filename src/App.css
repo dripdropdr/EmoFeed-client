@@ -37,14 +37,48 @@
   }
 }
 
-
-.speech-bubble {
-	position: relative;
-	background: #fee486;
-	border-radius: 36px;
+.container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100vh;
+  overflow: hidden;
+  padding: 0 0 30px 0;
 }
 
-.speech-bubble:after {
+.header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.dataSection {
+  margin-left: 20px;
+  color: white; /* 데이터 글자 색상을 흰색으로 설정 */
+}
+
+body {
+  background-color: black;
+  color: white; /* 기본 글씨 설정 흰색 */ 
+}
+
+.speechBubble {
+  background: #fee486;
+  border-radius: 15px;
+  width: 400px;
+  height: 144px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 20px;
+  right: 250px; /* 위치: 필요에 따라 조절 */
+}
+
+.speechBubble:after {
 	content: '';
 	position: absolute;
 	right: 0;
@@ -56,4 +90,35 @@
 	border-right: 0;
 	margin-top: -16px;
 	margin-right: -16px;
+}
+
+.videoSection {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  width: 200px;
+  height: 150px;
+  overflow: hidden;
+}
+
+.middleSection {
+  display: flex;
+  width: 100%;
+  margin-top: 15px; /*위치 옯기기*/
+}
+
+.videoContainer {
+  width: 65%;
+  padding-top: 36.5625%;
+  position: relative;
+  margin: auto;
+}
+
+.webcamStream {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }

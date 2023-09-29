@@ -33,6 +33,10 @@ function App() {
                   return "/videos/sadness-low.mp4";
                 case 'anger':
                     return "/videos/anger-low.mp4";
+                case 'surprise':
+                    return "/videos/surprise-low.mp4";
+                case 'confusion':
+                    return "/videos/confusion-low.mp4";
                 default:
                   return "/videos/neutral.mp4";
               }
@@ -40,11 +44,15 @@ function App() {
     } else { // 다른 감정 ...
         switch (data.emotion1) {
             case 'happiness':
-                return "/videos/happiness-mid.mp4";
+                return "/videos/happiness-high.mp4";
             case 'sadness':
                 return "/videos/sadness-high.mp4";
             case 'anger':
                 return "/videos/anger-high.mp4";
+            case 'surprise':
+                return "/videos/surprise-high.mp4";
+            case 'confusion':
+                return "/videos/confusion-high.mp4";
             default:
                 return "/videos/neutral.mp4";
           }

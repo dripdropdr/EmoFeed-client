@@ -6,10 +6,19 @@ function App() {
   const flaskEndpoint = "http://127.0.0.1:5000/webcam";
   const analysisEndpoint = "http://127.0.0.1:5000/webcam_analysis";
 
-  const [data, setData] = useState({ drowsiness: null, emotion1: null, emotion1_strength: null, emotion2: null, emotion2_strength: null });
+  const [data, setData] = useState({ drowsiness: null, confusion:null, emotion1: null, emotion1_strength: null, emotion2: null, emotion2_strength: null });
   // 'neutral', 'anger', 'disgust', 'fear', 'happiness', 'sadness', 'surprise'
 
   const getVideoUrl = (data) => {
+
+    // confusion
+    if (data.confusion > 0.5){
+        if (data.confusion >= 0.75){
+            return "/videos/confusion-high.mp4";
+        } else {
+            return "/videos/confusion-low.mp4";
+        }
+    }
 
     // 졸릴 때
     if (data.drowsiness > 0.5){
@@ -35,8 +44,8 @@ function App() {
                     return "/videos/anger-low.mp4";
                 case 'surprise':
                     return "/videos/surprise-low.mp4";
-                case 'confusion':
-                    return "/videos/confusion-low.mp4";
+                // case 'confusion':
+                //     return "/videos/confusion-low.mp4";
                 default:
                   return "/videos/neutral.mp4";
               }
@@ -51,8 +60,8 @@ function App() {
                 return "/videos/anger-high.mp4";
             case 'surprise':
                 return "/videos/surprise-high.mp4";
-            case 'confusion':
-                return "/videos/confusion-high.mp4";
+            // case 'confusion':
+            //     return "/videos/confusion-high.mp4";
             default:
                 return "/videos/neutral.mp4";
           }

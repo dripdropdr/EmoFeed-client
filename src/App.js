@@ -7,7 +7,8 @@ import './App.css';
 function App() {
   const flaskEndpoint = "http://127.0.0.1:5000/webcam";
   const analysisEndpoint = "http://127.0.0.1:5000/webcam_analysis";
-
+  //Dashboard 컴포넌트 렌더링(숨겨두다가 report 눌러야 뜨도록)
+  const [showDashboard, setShowDashboard] = useState(false);
   const [data, setData] = useState({ drowsiness: null, emotion1: null, emotion1_strength: null, emotion2: null, emotion2_strength: null });
   // 'neutral', 'anger', 'disgust', 'fear', 'happiness', 'sadness', 'surprise'
   const [text] = useState('chat-GPT here');
@@ -103,7 +104,14 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/report" element={<Dashboard />} />
+        <Route
+          path="/report"
+          element={
+            <div className={showDashboard ? 'dashboard-visible' : 'dashboard-hidden'}>
+              <Dashboard />
+            </div>
+          }
+        />
         <Route path="/" element={
           <div className="container">
             <div className="header">
@@ -111,7 +119,7 @@ function App() {
                 <h2>Analysis Data</h2>
                 <p>Drowsiness: {data.drowsiness}</p>
                 <p>Emotion: {data.emotion}</p>
-                <Link to="/report">Report</Link>
+                <Link to="/report" onClick={() => setShowDashboard(true)}>Report</Link>
               </div>
               <div className="speechBubble">
                 <h1 style={{ fontSize }}>{text}</h1>

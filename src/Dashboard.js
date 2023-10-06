@@ -4,7 +4,7 @@ import * as am4core from "@amcharts/amcharts4/core";
 import * as am4charts from "@amcharts/amcharts4/charts";
 
 function Dashboard() {
-    const Endpoint = "http://127.0.0.1:5000/new_endpoint"
+    const Endpoint = "http://127.0.0.1:5000/status"
     const chartRef = useRef(null);
     const [chart, setChart] = useState(null);
 
@@ -54,7 +54,7 @@ function Dashboard() {
             // Tooltip 설정
             series.tooltip.getFillFromObject = false; // 기본적으로 오브젝트(여기서는 라인)의 색상을 사용하지 않도록 설정합니다.
             series.tooltip.background.fill = am4core.color(color); // Tooltip의 배경색을 라인의 색상과 동일하게 설정합니다.
-            if (name === "disgust") { // series가 "disgust"일 때만
+            if (name === "happiness"|| name === "surprise") { 
                 series.tooltip.label.fill = am4core.color("#000000"); // 말풍선 라벨을 검은색으로 설정
             }
 
@@ -62,16 +62,26 @@ function Dashboard() {
         }
 
 
-        createSeries("drowsiness", "#FF0000"); // 각각의 시리즈에 대해 원하는 색상을 지정할 수 있습니다.
-        createSeries("neutral", "#0000FF");
-        createSeries("anger", "#00FF00");
-        createSeries("disgust", "#FFFF00");
-        createSeries("fear", "#FF00FF");
-        createSeries("happiness", "#00FFFF");
-        createSeries("sadness", "#000000");
-        createSeries("surprise", "#888888");
+        createSeries("drowsiness", "#FF00FF"); // 각각의 시리즈에 대해 원하는 색상을 지정할 수 있습니다.
+        createSeries("neutral", "#888888");
+        createSeries("anger", "#FF0000");
+        createSeries("disgust", "#00FF00");
+        createSeries("fear", "#000000");
+        createSeries("happiness", "#FFFF00");
+        createSeries("sadness", "#0000FF");
+        createSeries("surprise", "#00FFFF");
 
-        x.legend = new am4charts.Legend(); // 범례 추가
+        // // 원 그래프 추가
+        // let pieSeries = x.series.push(new am4charts.PieSeries());
+        // pieSeries.dataFields.value = "value"; // 각각의 감정에 대한 백분율 데이터
+        // pieSeries.dataFields.category = "emotion"; // 감정 이름
+        // pieSeries.slices.template.tooltipText = "{category}: {value.formatNumber('#.0')}%"; // 감정 이름과 백분율 표시
+        // pieSeries.labels.template.disabled = true; // 라벨 비활성화
+        // pieSeries.ticks.template.disabled = true; // 눈금선 비활성화
+        // pieSeries.slices.template.fillOpacity = 0.7; // 파이 그래프 조각의 투명도 설정
+
+        // 범례 추가
+        x.legend = new am4charts.Legend(); 
         x.legend.position = "right"; // 범례의 위치를 차트의 우측에 설정
 
         x.legend.itemContainers.template.events.on("over", function (event) {
@@ -137,13 +147,30 @@ function Dashboard() {
                 try {
                     const response = await axios.get(Endpoint);
                     if (response.status === 200) {
-                        const { drowsiness, emotions } = response.data; // destructuring을 사용하여 drowsiness와 emotions를 추출
-                        const newData = {
-                            date: new Date(), // Using current Date
-                            drowsiness: drowsiness, // drowsiness를 직접 매핑
-                            ...emotions // emotions 객체를 spread
-                        };
-                        chart.addData(newData);
+                        const data = response.data; // 응답 데이터를 가져옵니다.
+                        const newDataArray = []; // 새로운 데이터 배열을 만듭니다.
+                    
+                        // 데이터 배열의 각 요소를 순회하며 newData 객체를 생성하고 newDataArray에 추가합니다.
+                        data.forEach((item) => {
+                            const newData = {
+                                date: item.timestamp ,
+                                anger: item.anger,
+                                confusion: item.confusion,
+                                disgust: item.disgust,
+                                drowsiness: item.drowsiness,
+                                fear: item.fear,
+                                happiness: item.happiness,
+                                neutral: item.neutral,
+                                sadness: item.sadness,
+                                surprise: item.surprise
+
+                            };
+                    
+                            newDataArray.push(newData); // newData를 newDataArray에 추가합니다.
+                        });
+                    
+                        console.log("Response Data:", newDataArray)
+                        chart.addData(newDataArray);                    
                     }
                 } catch (error) {
                     console.error("Error fetching the webcam analysis data", error);

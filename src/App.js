@@ -125,7 +125,7 @@ function App() {
                 <h1 style={{ fontSize }}>{text}</h1>
               </div>
               <div className="videoSection">
-                <video width="200" height="150" muted autoPlay>
+                <video width="240" height="180" muted autoPlay>
                   <source src={process.env.PUBLIC_URL + getVideoUrl(data)} type="video/mp4" />
                   Your browser does not support the video tag.
                 </video>

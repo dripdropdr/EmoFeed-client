@@ -7,7 +7,8 @@ function App() {
   const analysisEndpoint = "/webcam_analysis";
   const statusEndpoint = "/status";
 
-  const [data, setData] = useState({ drowsiness: null, confusion:null, emotion1: null, emotion1_strength: null, emotion2: null, emotion2_strength: null, all_status: null});
+  const [data, setData] = useState({ drowsiness: null, confusion:null, emotion1: null, 
+                                    emotion1_strength: null, emotion2: null, emotion2_strength: null, all_status: null, assistant:null});
   // 'neutral', 'anger', 'disgust', 'fear', 'happiness', 'sadness', 'surprise'
 
   const getVideoUrl = (data) => {

@@ -3,10 +3,11 @@ import React from 'react';
 // import './App.css';
 
 function App() {
-  const flaskEndpoint = "http://127.0.0.1:5000/webcam";
-  const analysisEndpoint = "http://127.0.0.1:5000/webcam_analysis";
+  const flaskEndpoint = "/webcam"; // http://127.0.0.1:5000
+  const analysisEndpoint = "/webcam_analysis";
+  const statusEndpoint = "/status";
 
-  const [data, setData] = useState({ drowsiness: null, confusion:null, emotion1: null, emotion1_strength: null, emotion2: null, emotion2_strength: null });
+  const [data, setData] = useState({ drowsiness: null, confusion:null, emotion1: null, emotion1_strength: null, emotion2: null, emotion2_strength: null, all_status: null});
   // 'neutral', 'anger', 'disgust', 'fear', 'happiness', 'sadness', 'surprise'
 
   const getVideoUrl = (data) => {
@@ -88,8 +89,8 @@ function App() {
       }
     };
 
-    // 3초마다 데이터를 가져옵니다.
-    const intervalId = setInterval(fetchData, 4000);
+    // 4초마다 데이터를 가져옵니다.
+    const intervalId = setInterval(fetchData, 3900);
 
     // 컴포넌트가 unmount 될 때 interval을 정리합니다.
     return () => {

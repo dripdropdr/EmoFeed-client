@@ -4,7 +4,8 @@ import * as am4core from "@amcharts/amcharts4/core";
 import * as am4charts from "@amcharts/amcharts4/charts";
 
 function Dashboard() {
-    const Endpoint = "http://127.0.0.1:5000/status"
+    const StatusEndpoint = "http://127.0.0.1:5000/status"
+    const RealTimeEndpoint = "http://127.0.0.1:5000/webcam_analysis"
     const chartRef = useRef(null);
     const [chart, setChart] = useState(null);
 
@@ -15,14 +16,11 @@ function Dashboard() {
         x.paddingRight = 20;
         x.background.fill = am4core.color("#ffffff");
 
+        // x축 설정
         let dateAxis = x.xAxes.push(new am4charts.DateAxis());
         dateAxis.renderer.grid.template.location = 0;
         dateAxis.title.text = "Time";
-        // 30초의 데이터만 보여주도록 start와 end 설정
-        dateAxis.start = 1 - (30 / (30 * 60)); // 30초를 30분으로 나눈 값으로 설정
-        dateAxis.end = 1;
-        dateAxis.keepSelection = true; // 사용자가 스크롤하거나 확대/축소하여 선택한 범위를 유지
-
+        dateAxis.keepSelection = true;
 
         let valueAxis = x.yAxes.push(new am4charts.ValueAxis());
         valueAxis.min = 0; // 최소값을 0으로 설정
@@ -32,15 +30,16 @@ function Dashboard() {
         valueAxis.renderer.minWidth = 35;
         valueAxis.title.text = "Value";
 
-        // Cursor 설정을 통해 차트의 확대/축소를 가능하게 합니다.
+        // Cursor 설정을 통해 각 수치 표시
         x.cursor = new am4charts.XYCursor();
         x.cursor.behavior = "zoomY"; // Y축을 기준으로 줌 인/아웃
         x.cursor.lineY.disabled = true; // X축 점선을 제거합니다.
 
         // Scrollbar 설정을 통해 확대/축소 상태에서 차트를 이동할 수 있게 합니다.
-        x.scrollbarX = new am4core.Scrollbar();
-        x.scrollbarY = new am4core.Scrollbar();
-        x.scrollbarY.marginLeft = 0;
+        // x.scrollbarX = new am4core.Scrollbar();
+        // x.scrollbarX.keepFocus = false;
+        // x.scrollbarY = new am4core.Scrollbar();
+        // x.scrollbarY.marginLeft = 0;
 
         function createSeries(name, color) {
             let series = x.series.push(new am4charts.LineSeries());
@@ -54,15 +53,14 @@ function Dashboard() {
             // Tooltip 설정
             series.tooltip.getFillFromObject = false; // 기본적으로 오브젝트(여기서는 라인)의 색상을 사용하지 않도록 설정합니다.
             series.tooltip.background.fill = am4core.color(color); // Tooltip의 배경색을 라인의 색상과 동일하게 설정합니다.
-            if (name === "happiness"|| name === "surprise") { 
+            if (name === "happiness" || name === "surprise") {
                 series.tooltip.label.fill = am4core.color("#000000"); // 말풍선 라벨을 검은색으로 설정
             }
-
             return series;
         }
 
 
-        createSeries("drowsiness", "#FF00FF"); // 각각의 시리즈에 대해 원하는 색상을 지정할 수 있습니다.
+        createSeries("drowsiness", "#FF00FF");
         createSeries("neutral", "#888888");
         createSeries("anger", "#FF0000");
         createSeries("disgust", "#00FF00");
@@ -71,32 +69,24 @@ function Dashboard() {
         createSeries("sadness", "#0000FF");
         createSeries("surprise", "#00FFFF");
 
-        // // 원 그래프 추가
-        // let pieSeries = x.series.push(new am4charts.PieSeries());
-        // pieSeries.dataFields.value = "value"; // 각각의 감정에 대한 백분율 데이터
-        // pieSeries.dataFields.category = "emotion"; // 감정 이름
-        // pieSeries.slices.template.tooltipText = "{category}: {value.formatNumber('#.0')}%"; // 감정 이름과 백분율 표시
-        // pieSeries.labels.template.disabled = true; // 라벨 비활성화
-        // pieSeries.ticks.template.disabled = true; // 눈금선 비활성화
-        // pieSeries.slices.template.fillOpacity = 0.7; // 파이 그래프 조각의 투명도 설정
 
-        // 범례 추가
-        x.legend = new am4charts.Legend(); 
-        x.legend.position = "right"; // 범례의 위치를 차트의 우측에 설정
+        // 우측 범례 추가
+        x.legend = new am4charts.Legend();
+        x.legend.position = "right"; 
 
         x.legend.itemContainers.template.events.on("over", function (event) {
             x.series.each((s) => {
                 s.stroke = am4core.color("#dcdcdc"); // 모든 series를 희미하게 만듭니다.
                 s.strokeWidth = 1;
             });
-            
+
             let activeSeries = event.target.dataItem.dataContext; // 마우스가 올라간 범례 아이템에 연결된 시리즈를 가져옵니다.
             if (activeSeries) {
                 activeSeries.stroke = activeSeries.defaultStroke; // activeSeries를 원래의 색으로 복원합니다.
-                activeSeries.strokeWidth = 3; // activeSeries를 강조합니다.
+                activeSeries.strokeWidth = 3; // 강조
             }
         });
-        
+
         x.legend.itemContainers.template.events.on("out", function (event) {
             x.series.each((s) => {
                 s.stroke = s.defaultStroke; // 모든 series를 원래의 색으로 복원합니다.
@@ -104,36 +94,6 @@ function Dashboard() {
             });
         });
 
-        // let lastClicked; // 아이템 클릭을 위한 변수 추가 >>  *****이거 DB연결하고 다시 이어지는지 해보기(지금은 누르면 다른 그래프 사라짐)*****
-        // x.legend.itemContainers.template.events.on("hit", function (event) {
-        //     let series = event.target.dataItem.dataContext;
-        
-        //     if (lastClicked && lastClicked === series) {
-        //         // 이전에 선택한 아이템을 다시 선택한 경우, 모든 시리즈를 원래대로 복원합니다.
-        //         x.series.each((s) => {
-        //             s.stroke = s.defaultStroke;
-        //             s.strokeWidth = 2;
-        //             s.hidden = false; // 모든 series를 보이게 설정합니다.
-        //         });
-        //         lastClicked = null; // lastClicked를 초기화합니다.
-        //     } else {
-        //         // 다른 아이템을 선택한 경우, 해당 시리즈를 강조합니다.
-        //         x.series.each((s) => {
-        //             if (s !== series) {
-        //                 s.stroke = am4core.color("#dcdcdc"); // 다른 series를 희미하게 만듭니다.
-        //                 s.strokeWidth = 1;
-        //                 s.hidden = true; // 다른 series를 숨깁니다.
-        //             } else {
-        //                 series.stroke = series.defaultStroke;
-        //                 series.strokeWidth = 3;
-        //                 series.hidden = false; // 선택한 series를 보이게 설정합니다.
-        //             }
-        //         });
-        //         lastClicked = series; // lastClicked를 업데이트합니다.
-        //     }
-        // });
-
-        
         setChart(x);
 
         return () => {
@@ -143,17 +103,21 @@ function Dashboard() {
 
     useEffect(() => {
         if (chart) {
-            const fetchData = async () => {
+            const fetchInitialData = async () => {
                 try {
-                    const response = await axios.get(Endpoint);
+                    const response = await axios.get(StatusEndpoint);
                     if (response.status === 200) {
-                        const data = response.data; // 응답 데이터를 가져옵니다.
-                        const newDataArray = []; // 새로운 데이터 배열을 만듭니다.
-                    
+                        const data = response.data; 
+                        let newDataArray = []; 
+
                         // 데이터 배열의 각 요소를 순회하며 newData 객체를 생성하고 newDataArray에 추가합니다.
                         data.forEach((item) => {
-                            const newData = {
-                                date: item.timestamp ,
+
+                            // timestamp 값을 Date 객체로 변환
+                            //let dateObj = new Date(item.timestamp * 1000);
+
+                            let newData = {
+                                date: new Date(item.timestamp * 1000),
                                 anger: item.anger,
                                 confusion: item.confusion,
                                 disgust: item.disgust,
@@ -165,19 +129,62 @@ function Dashboard() {
                                 surprise: item.surprise
 
                             };
-                    
+
                             newDataArray.push(newData); // newData를 newDataArray에 추가합니다.
                         });
-                    
+
                         console.log("Response Data:", newDataArray)
-                        chart.addData(newDataArray);                    
+                        chart.data = newDataArray; // 초기 데이터로 업데이트                 
+
+                        // x축 범위를 마지막 데이터 시간을 중심으로 설정
+                        let lastTimestamp = data[data.length - 1].timestamp * 1000;
+
+                        let startTime = lastTimestamp - 60 * 1000; // 1분 전
+                        chart.xAxes.getIndex(0).zoomToDates(new Date(startTime), new Date(lastTimestamp));
                     }
                 } catch (error) {
                     console.error("Error fetching the webcam analysis data", error);
                 }
             };
-            const interval = setInterval(fetchData, 3000); // Fetch data every 3 seconds
-            return () => clearInterval(interval); // Clear interval when component unmounts
+            // 초기 데이터를 가져온 후에 실시간 데이터 가져오도록 설정
+            fetchInitialData();
+
+            // 실시간 데이터 업데이트 함수 생성 및 호출 
+            setInterval(async () => {
+                try {
+                    let response = await axios.get(RealTimeEndpoint);
+
+                    if (response.status === 200) {
+
+                        let rawData = response.data.all;
+
+                        console.log("Real Time Data:", response.data.all);
+
+                        // timestamp 값을 Date 객체로 변환합니다.
+                        //let dateObj = new Date(rawData.timestamp * 1000);
+
+                        var newData = {
+                            date: new Date(rawData.timestamp * 1000),
+                            anger: rawData.anger,
+                            confusion: rawData.confusion,
+                            disgust: rawData.disgust,
+                            drowsiness: rawData.drowsiness,
+                            fear: rawData.fear,
+                            happiness: rawData.happiness,
+                            neutral: rawData.neutral,
+                            sadness: rawData.sadness,
+                            surprise: rawData.surprise
+                        };
+
+                        chart.addData([newData], 1); // 데이터를 추가합니다.
+
+                        let startTime = newData.date.getTime() - 60 * 1000; // 1분 전
+                        chart.xAxes.getIndex(0).zoomToDates(new Date(startTime), newData.date);
+                    }
+                } catch (error) {
+                    console.error("Error fetching real-time data", error);
+                }
+            }, 3000); // 3초마다 업데이트 
         }
     }, [chart]);
 

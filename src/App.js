@@ -5,8 +5,9 @@ import Dashboard from './Dashboard';
 import './App.css';
 
 function App() {
-  const flaskEndpoint = "http://127.0.0.1:5000/webcam";
+  const flaskEndpoint = "http://127.0.0.1:5000/webcam"; // http://127.0.0.1:5000
   const analysisEndpoint = "http://127.0.0.1:5000/webcam_analysis";
+
   //Dashboard 컴포넌트 렌더링(숨겨두다가 report 눌러야 뜨도록)
   const [showDashboard, setShowDashboard] = useState(false);
   const [data, setData] = useState({ drowsiness: null, emotion1: null, emotion1_strength: null, emotion2: null, emotion2_strength: null });
@@ -15,6 +16,15 @@ function App() {
   const [fontSize, setFontSize] = useState('1em');
 
   const getVideoUrl = (data) => {
+
+    // confusion
+    if (data.confusion > 0.5){
+        if (data.confusion >= 0.75){
+            return "/videos/confusion-high.mp4";
+        } else {
+            return "/videos/confusion-low.mp4";
+        }
+    }
 
     // 졸릴 때
     if (data.drowsiness > 0.5) {
@@ -26,41 +36,41 @@ function App() {
     }
 
     // 안 졸릴때
-    if (data.emotion1 === 'neutral') {
-      if (data.emotion1_strength >= 0.5) {
-        return "/videos/neutral.mp4";
-      } else {
-        // low strength 
-        switch (data.emotion2) {
-          case 'happiness':
-            return "/videos/happiness-low.mp4";
-          case 'sadness':
-            return "/videos/sadness-low.mp4";
-          case 'anger':
-            return "/videos/anger-low.mp4";
-          case 'surprise':
-            return "/videos/surprise-low.mp4";
-          case 'confusion':
-            return "/videos/confusion-low.mp4";
-          default:
+    if (data.emotion1 === 'neutral'){
+        if (data.emotion1_strength >= 0.5){
             return "/videos/neutral.mp4";
+        } else {
+            // low strength 
+            switch (data.emotion2) {
+                case 'happiness':
+                  return "/videos/happiness-low.mp4";
+                case 'sadness':
+                  return "/videos/sadness-low.mp4";
+                case 'anger':
+                    return "/videos/anger-low.mp4";
+                case 'surprise':
+                    return "/videos/surprise-low.mp4";
+                // case 'confusion':
+                //     return "/videos/confusion-low.mp4";
+                default:
+                  return "/videos/neutral.mp4";
+              }
         }
-      }
     } else { // 다른 감정 ...
-      switch (data.emotion1) {
-        case 'happiness':
-          return "/videos/happiness-high.mp4";
-        case 'sadness':
-          return "/videos/sadness-high.mp4";
-        case 'anger':
-          return "/videos/anger-high.mp4";
-        case 'surprise':
-          return "/videos/surprise-high.mp4";
-        case 'confusion':
-          return "/videos/confusion-high.mp4";
-        default:
-          return "/videos/neutral.mp4";
-      }
+        switch (data.emotion1) {
+            case 'happiness':
+                return "/videos/happiness-high.mp4";
+            case 'sadness':
+                return "/videos/sadness-high.mp4";
+            case 'anger':
+                return "/videos/anger-high.mp4";
+            case 'surprise':
+                return "/videos/surprise-high.mp4";
+            // case 'confusion':
+            //     return "/videos/confusion-high.mp4";
+            default:
+                return "/videos/neutral.mp4";
+          }
     }
   };
 
@@ -84,7 +94,7 @@ function App() {
       }
     };
 
-    // 3초마다 데이터를 가져옵니다.
+    // 4초마다 데이터를 가져옵니다.
     const intervalId = setInterval(fetchData, 4000);
 
     // 컴포넌트가 unmount 될 때 interval을 정리합니다.
@@ -118,7 +128,9 @@ function App() {
               <div className="dataSection">
                 <h2>Analysis Data</h2>
                 <p>Drowsiness: {data.drowsiness}</p>
-                <p>Emotion: {data.emotion}</p>
+                <p>Confusion: {data.confusion}</p>
+                <p>{data.emotion1}: {data.emotion1_strength}</p>
+                <p>{data.emotion2}: {data.emotion2_strength}</p>
                 <Link to="/report" onClick={() => setShowDashboard(true)}>Report</Link>
               </div>
               <div className="speechBubble">

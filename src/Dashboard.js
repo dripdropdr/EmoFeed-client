@@ -72,7 +72,7 @@ function Dashboard() {
 
         // 우측 범례 추가
         x.legend = new am4charts.Legend();
-        x.legend.position = "right"; 
+        x.legend.position = "right";
 
         x.legend.itemContainers.template.events.on("over", function (event) {
             x.series.each((s) => {
@@ -107,8 +107,8 @@ function Dashboard() {
                 try {
                     const response = await axios.get(StatusEndpoint);
                     if (response.status === 200) {
-                        const data = response.data; 
-                        let newDataArray = []; 
+                        const data = response.data;
+                        let newDataArray = [];
 
                         // 데이터 배열의 각 요소를 순회하며 newData 객체를 생성하고 newDataArray에 추가합니다.
                         data.forEach((item) => {
@@ -188,7 +188,14 @@ function Dashboard() {
         }
     }, [chart]);
 
-    return <div id="chartdiv" ref={chartRef} style={{ width: "100%", height: "500px", marginTop: "100px" }} />;
+    return (
+        <div className='dataSection'>
+            <h1>EmoFeed Analysis</h1>
+            <div id="chartdiv" ref={chartRef} style={{ width: "100%", height: "500px", marginTop: "50px"}}/>
+        </div>
+
+    );
+
 }
 
 

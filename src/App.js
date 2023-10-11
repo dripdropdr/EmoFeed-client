@@ -10,7 +10,7 @@ function App() {
 
   //Dashboard 컴포넌트 렌더링(숨겨두다가 report 눌러야 뜨도록)
   const [showDashboard, setShowDashboard] = useState(false);
-  const [data, setData] = useState({ drowsiness: null, emotion1: null, emotion1_strength: null, emotion2: null, emotion2_strength: null });
+  const [data, setData] = useState({ drowsiness: null, emotion1: null, emotion1_strength: null, emotion2: null, emotion2_strength: null, assistant:null});
   // 'neutral', 'anger', 'disgust', 'fear', 'happiness', 'sadness', 'surprise'
   const [text] = useState('chat-GPT here');
   const [fontSize, setFontSize] = useState('1em');
@@ -18,7 +18,7 @@ function App() {
   const getVideoUrl = (data) => {
 
     // confusion
-    if (data.confusion > 0.5){
+    if (data.confusion > 0.55){
         if (data.confusion >= 0.75){
             return "/videos/confusion-high.mp4";
         } else {
@@ -27,7 +27,7 @@ function App() {
     }
 
     // 졸릴 때
-    if (data.drowsiness > 0.5) {
+    if (data.drowsiness > 0.55) {
       if (data.drowsiness >= 0.75) {
         return "/videos/drowsiness-high.mp4";
       } else {
@@ -126,7 +126,7 @@ function App() {
           <div className="container">
             <div className="header">
               <div className="dataSection">
-                <h2>Analysis Data</h2>
+                <h2>EmoFeed</h2>
                 <p>Drowsiness: {data.drowsiness}</p>
                 <p>Confusion: {data.confusion}</p>
                 <p>{data.emotion1}: {data.emotion1_strength}</p>
@@ -134,7 +134,7 @@ function App() {
                 <Link to="/report" onClick={() => setShowDashboard(true)}>Report</Link>
               </div>
               <div className="speechBubble">
-                <h1 style={{ fontSize }}>{text}</h1>
+                <h1 style={{ fontSize }}>{data.assistant}</h1>
               </div>
               <div className="videoSection">
                 <video width="240" height="180" muted autoPlay>

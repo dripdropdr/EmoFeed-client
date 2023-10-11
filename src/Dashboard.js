@@ -184,13 +184,13 @@ function Dashboard() {
                 } catch (error) {
                     console.error("Error fetching real-time data", error);
                 }
-            }, 3000); // 3초마다 업데이트 
+            }, 4000); // 3초마다 업데이트 
         }
     }, [chart]);
 
     return (
         <div className='dataSection'>
-            <h1>EmoFeed Analysis</h1>
+            <h1>EmoFeed - Report</h1>
             <div id="chartdiv" ref={chartRef} style={{ width: "100%", height: "500px", marginTop: "50px"}}/>
         </div>
 

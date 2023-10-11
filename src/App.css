@@ -74,8 +74,8 @@ body {
 .speechBubble {
   background: #fee486;
   border-radius: 15px;
-  min-width: 400px;
-  height: 100px;
+  width: 400px;
+  max-height: 100px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -87,6 +87,7 @@ body {
   /* 패딩 추가하여 텍스트와 테두리 간의 여백 생성 */
   flex-wrap: wrap;
   /* 텍스트가 많아지면 자동으로 줄 바꿈되게 설정 */
+  overflow: auto;
 }
 
 .speechBubble:after {

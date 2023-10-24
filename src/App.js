@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Link, useNavigate, useLocation } from 'react-router-dom'; // Switch를 Routes로 바꿈
 import Dashboard from './Dashboard';
+import Endreport from './Endreport';
 import './App.css';
 
 function IntroPage() {
@@ -46,7 +47,7 @@ function EndPage() {
 
         {/* Dashboard 컴포넌트 추가 */}
         <div className={showDashboard ? 'dashboard-visible' : 'dashboard-hidden'}>
-          <Dashboard />
+          <Endreport />
         </div>
     </div>
   );
@@ -54,6 +55,7 @@ function EndPage() {
 
 
 function App() {
+
   const flaskEndpoint = "/webcam"; // http://127.0.0.1:5000
   const analysisEndpoint = "/webcam_analysis";
 
@@ -169,7 +171,6 @@ function App() {
                 <p>Confusion: {data.confusion}</p>
                 <p>{data.emotion1}: {data.emotion1_strength}</p>
                 <p>{data.emotion2}: {data.emotion2_strength}</p>
-                <Link to="/report" onClick={() => setShowDashboard(true)}>Report</Link>
               </div>
               <div className="speechBubble">
                 <h1 style={{ fontSize }}>{data.assistant}</h1>
@@ -188,7 +189,7 @@ function App() {
             </div>
           </div>
         } />
-        <Route path="/report" element={<EndPage/>}/>
+        <Route path="/endreport" element={<EndPage/>}/>
       </Routes>
   );
 }

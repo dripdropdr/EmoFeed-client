@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import * as am4core from "@amcharts/amcharts4/core";
 import * as am4charts from "@amcharts/amcharts4/charts";
+import {ReactComponent as Logo} from './assets/emofeed-logo.svg';
 
 function Dashboard() {
     const StatusEndpoint = "http://127.0.0.1:5000/status"
@@ -53,7 +54,7 @@ function Dashboard() {
             // Tooltip 설정
             series.tooltip.getFillFromObject = false; // 기본적으로 오브젝트(여기서는 라인)의 색상을 사용하지 않도록 설정합니다.
             series.tooltip.background.fill = am4core.color(color); // Tooltip의 배경색을 라인의 색상과 동일하게 설정합니다.
-            if (name === "happiness" || name === "surprise") {
+            if (name === "happiness") {
                 series.tooltip.label.fill = am4core.color("#000000"); // 말풍선 라벨을 검은색으로 설정
             }
             return series;
@@ -61,13 +62,14 @@ function Dashboard() {
 
 
         createSeries("drowsiness", "#FF00FF");
-        createSeries("neutral", "#888888");
-        createSeries("anger", "#FF0000");
-        createSeries("disgust", "#00FF00");
-        createSeries("fear", "#000000");
+        //createSeries("neutral", "#888888");
+        //createSeries("anger", "#FF0000");
+        //createSeries("disgust", "#00FF00");
+        //createSeries("fear", "#000000");
+        createSeries("confusion", "#FF0000");
         createSeries("happiness", "#FFFF00");
-        createSeries("sadness", "#0000FF");
-        createSeries("surprise", "#00FFFF");
+        //createSeries("sadness", "#00FFFF");
+        createSeries("surprise", "#0000FF");
 
 
         // 우측 범례 추가
@@ -118,14 +120,14 @@ function Dashboard() {
 
                             let newData = {
                                 date: new Date(item.timestamp * 1000),
-                                anger: item.anger,
+                                //anger: item.anger,
                                 confusion: item.confusion,
-                                disgust: item.disgust,
+                                //disgust: item.disgust,
                                 drowsiness: item.drowsiness,
-                                fear: item.fear,
+                                //fear: item.fear,
                                 happiness: item.happiness,
-                                neutral: item.neutral,
-                                sadness: item.sadness,
+                                //neutral: item.neutral,
+                                //sadness: item.sadness,
                                 surprise: item.surprise
 
                             };
@@ -165,14 +167,14 @@ function Dashboard() {
 
                         var newData = {
                             date: new Date(rawData.timestamp * 1000),
-                            anger: rawData.anger,
+                            //anger: rawData.anger,
                             confusion: rawData.confusion,
-                            disgust: rawData.disgust,
+                            //disgust: rawData.disgust,
                             drowsiness: rawData.drowsiness,
-                            fear: rawData.fear,
+                            //fear: rawData.fear,
                             happiness: rawData.happiness,
-                            neutral: rawData.neutral,
-                            sadness: rawData.sadness,
+                            //neutral: rawData.neutral,
+                            //sadness: rawData.sadness,
                             surprise: rawData.surprise
                         };
 
@@ -190,14 +192,13 @@ function Dashboard() {
 
     return (
         <div className='dataSection'>
-            <h1>EmoFeed - Report</h1>
-            <div id="chartdiv" ref={chartRef} style={{ width: "100%", height: "500px", marginTop: "50px"}}/>
+            {/* <h1>EmoFeed - Report</h1> EmoFeed 하단 로고로 바꿈, 흰색임*/}
+            <Logo/>
+            <div id="chartdiv" ref={chartRef} style={{ width: "100%", height: "500px", marginTop: "50px" }} />
         </div>
 
     );
 
 }
 
-
 export default Dashboard;
-

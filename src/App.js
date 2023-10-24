@@ -2,11 +2,12 @@ import { useEffect, useState, useRef } from 'react';
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom'; // Switch를 Routes로 바꿈
 import Dashboard from './Dashboard';
+import Endreport from './Endreport';
 import './App.css';
 
 function App() {
   const flaskEndpoint = "http://127.0.0.1:5000/webcam"; // http://127.0.0.1:5000
-  const analysisEndpoint = "http://127.0.0.1:5000/webcam_analysis";
+  const analysisEndpoint = "http://127.0.0.1:5000/webcam_analysis"; 
 
   //Dashboard 컴포넌트 렌더링(숨겨두다가 report 눌러야 뜨도록)
   const [showDashboard, setShowDashboard] = useState(false);
@@ -122,6 +123,11 @@ function App() {
             </div>
           }
         />
+        {/* endreport 경로 추가 */}
+        <Route
+          path="/endreport"
+          element={<Endreport />}
+        />
         <Route path="/" element={
           <div className="container">
             <div className="header">
@@ -131,7 +137,8 @@ function App() {
                 <p>Confusion: {data.confusion}</p>
                 <p>{data.emotion1}: {data.emotion1_strength}</p>
                 <p>{data.emotion2}: {data.emotion2_strength}</p>
-                <Link to="/report" onClick={() => setShowDashboard(true)}>Report</Link>
+                <Link to="/report" onClick={() => setShowDashboard(true)}>Report</Link><br/>
+                <Link to="/endreport">End Report</Link>
               </div>
               <div className="speechBubble">
                 <h1 style={{ fontSize }}>{data.assistant}</h1>

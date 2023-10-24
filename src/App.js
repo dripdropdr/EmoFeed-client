@@ -18,7 +18,36 @@ function IntroPage() {
   return (
     <div className={`introContainer ${animateOut ? 'animateOut' : ''}`}>
         <img src={process.env.PUBLIC_URL + 'images/emofeed-logo.svg'} onClick={handleProceedClick} alt="Emofeed logo" className="emofeedlogo"/>
+        <video width="500" className='introface' muted autoPlay>
+          <source src={process.env.PUBLIC_URL + "/videos/happiness-low.mp4"} type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
         <img src={process.env.PUBLIC_URL + 'images/emofeed-start.svg'} onClick={handleProceedClick} alt="Shall we start" className="emofeedstart" />
+    </div>
+  );
+}
+
+function EndPage() {
+  const navigate = useNavigate();
+  const [animateOut, setAnimateOut] = useState(false);
+  const [showDashboard, setShowDashboard] = useState(false);  // Dashboard 표시 여부를 제어하는 상태
+
+  const handleProceedClick = () => {
+    setAnimateOut(true);
+    setTimeout(() => {
+        navigate("/main");
+    }, 1000);
+  };
+
+  return (
+    <div className={`endContainer ${animateOut ? 'animateOut' : ''}`}>
+        <h1>Thank you for using EmoFeed!</h1>
+        <button onClick={handleProceedClick}>Go to Main</button>
+
+        {/* Dashboard 컴포넌트 추가 */}
+        <div className={showDashboard ? 'dashboard-visible' : 'dashboard-hidden'}>
+          <Dashboard />
+        </div>
     </div>
   );
 }
@@ -96,6 +125,7 @@ function App() {
   };
 
   useEffect(() => {
+    console.log(location.pathname);
     if (location.pathname !== "/main") {
       return;  // 현재 경로가 /main이 아니면 fetchData 실행 중지
     }
@@ -158,16 +188,11 @@ function App() {
             </div>
           </div>
         } />
-        <Route
-          path="/report"
-          element={
-            <div className={showDashboard ? 'dashboard-visible' : 'dashboard-hidden'}>
-              <Dashboard />
-            </div>
-          }
-        />
+        <Route path="/report" element={<EndPage/>}/>
       </Routes>
   );
 }
 
 export default App;
+
+

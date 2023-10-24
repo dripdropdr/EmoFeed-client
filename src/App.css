@@ -136,13 +136,25 @@ body {
   object-fit: contain;
 }
 
+.introContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
 .introContainer.animateOut {
   animation: slideOutUp 1s forwards;
 }
 
 @keyframes slideOutUp {
   to {
-    transform: translateY(-100%);
+    /* transform: translateY(-100%); */
+    transform: translate(-50%, -100%);
     opacity: 0;
   }
 }
@@ -152,13 +164,12 @@ body {
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  width: 100%;
+  width: 200%;
   /* 애니메이션 설정 */
   animation: fadeInUp 1s ease forwards;
   /* 초기 상태: 약간 아래로 이동 */
   transform: translateY(20px);
   opacity: 0;
-
 }
 
 @keyframes fadeInUp {
@@ -166,6 +177,18 @@ body {
     transform: translateY(0);
     opacity: 1;
   }
+}
+
+.introface{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 50%;
+  /* 애니메이션 설정 */
+  animation: fadeInUp 1.2s ease forwards;
+  /* 초기 상태: 약간 아래로 이동 */
+  transform: translateY(20px);
 }
 
 .emofeedstart{
@@ -176,5 +199,21 @@ body {
   opacity: 0;
   text-align: center;
   margin-top: 10px;
-  width: 10%; 
+  width: 28%; 
+}
+
+@keyframes fadeInDashboardUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.endContainer {
+  opacity: 0;  /* 초기 상태 */
+  animation: fadeInDashboardUp 1s ease-in-out forwards;
 }

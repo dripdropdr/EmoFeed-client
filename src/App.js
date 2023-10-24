@@ -1,20 +1,71 @@
 import { useEffect, useState, useRef } from 'react';
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom'; // Switch를 Routes로 바꿈
+import { BrowserRouter as Router, Route, Routes, Link, useNavigate, useLocation } from 'react-router-dom'; // Switch를 Routes로 바꿈
 import Dashboard from './Dashboard';
 import Endreport from './Endreport';
 import './App.css';
 
+function IntroPage() {
+  const navigate = useNavigate();
+  const [animateOut, setAnimateOut] = useState(false);
+
+  const handleProceedClick = () => {
+    setAnimateOut(true);
+    setTimeout(() => {
+        navigate("/main");
+    }, 1000);  // 애니메이션 지속 시간과 일치해야 합니다.
+  };
+
+  return (
+    <div className={`introContainer ${animateOut ? 'animateOut' : ''}`}>
+        <img src={process.env.PUBLIC_URL + 'images/emofeed-logo.svg'} onClick={handleProceedClick} alt="Emofeed logo" className="emofeedlogo"/>
+        <video width="500" className='introface' muted autoPlay>
+          <source src={process.env.PUBLIC_URL + "/videos/happiness-low.mp4"} type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+        <img src={process.env.PUBLIC_URL + 'images/emofeed-start.svg'} onClick={handleProceedClick} alt="Shall we start" className="emofeedstart" />
+    </div>
+  );
+}
+
+function EndPage() {
+  const navigate = useNavigate();
+  const [animateOut, setAnimateOut] = useState(false);
+  const [showDashboard, setShowDashboard] = useState(false);  // Dashboard 표시 여부를 제어하는 상태
+
+  const handleProceedClick = () => {
+    setAnimateOut(true);
+    setTimeout(() => {
+        navigate("/main");
+    }, 1000);
+  };
+
+  return (
+    <div className={`endContainer ${animateOut ? 'animateOut' : ''}`}>
+        <h1>Thank you for using EmoFeed!</h1>
+        <button onClick={handleProceedClick}>Go to Main</button>
+
+        {/* Dashboard 컴포넌트 추가 */}
+        <div className={showDashboard ? 'dashboard-visible' : 'dashboard-hidden'}>
+          <Endreport />
+        </div>
+    </div>
+  );
+}
+
+
 function App() {
-  const flaskEndpoint = "http://127.0.0.1:5000/webcam"; // http://127.0.0.1:5000
-  const analysisEndpoint = "http://127.0.0.1:5000/webcam_analysis"; 
+
+  const flaskEndpoint = "/webcam"; // http://127.0.0.1:5000
+  const analysisEndpoint = "/webcam_analysis";
 
   //Dashboard 컴포넌트 렌더링(숨겨두다가 report 눌러야 뜨도록)
   const [showDashboard, setShowDashboard] = useState(false);
   const [data, setData] = useState({ drowsiness: null, emotion1: null, emotion1_strength: null, emotion2: null, emotion2_strength: null, assistant:null});
   // 'neutral', 'anger', 'disgust', 'fear', 'happiness', 'sadness', 'surprise'
-  const [text] = useState('chat-GPT here');
   const [fontSize, setFontSize] = useState('1em');
+  const location = useLocation();
+
 
   const getVideoUrl = (data) => {
 
@@ -38,7 +89,7 @@ function App() {
 
     // 안 졸릴때
     if (data.emotion1 === 'neutral'){
-        if (data.emotion1_strength >= 0.5){
+        if (data.emotion1_strength >= 0.45){
             return "/videos/neutral.mp4";
         } else {
             // low strength 
@@ -76,6 +127,10 @@ function App() {
   };
 
   useEffect(() => {
+    console.log(location.pathname);
+    if (location.pathname !== "/main") {
+      return;  // 현재 경로가 /main이 아니면 fetchData 실행 중지
+    }
     const fetchData = async () => {
       try {
         const response = await fetch(analysisEndpoint);
@@ -102,33 +157,12 @@ function App() {
     return () => {
       clearInterval(intervalId);
     };
-  }, [analysisEndpoint]);
-
-  // useEffect(() => {  //나중에 지피티 글씨 사이즈 반응형 변환 쓸 때 필요함
-  //   if (text.length > 20) {
-  //     setFontSize('0.8em');
-  //   } else {
-  //     setFontSize('1em');
-  //   }
-  // }, [text]);
+  }, [analysisEndpoint, location.pathname]);
 
   return (
-    <Router>
       <Routes>
-        <Route
-          path="/report"
-          element={
-            <div className={showDashboard ? 'dashboard-visible' : 'dashboard-hidden'}>
-              <Dashboard />
-            </div>
-          }
-        />
-        {/* endreport 경로 추가 */}
-        <Route
-          path="/endreport"
-          element={<Endreport />}
-        />
-        <Route path="/" element={
+        <Route path="/" element={<IntroPage />} />
+        <Route path="/main" element={
           <div className="container">
             <div className="header">
               <div className="dataSection">
@@ -137,8 +171,6 @@ function App() {
                 <p>Confusion: {data.confusion}</p>
                 <p>{data.emotion1}: {data.emotion1_strength}</p>
                 <p>{data.emotion2}: {data.emotion2_strength}</p>
-                <Link to="/report" onClick={() => setShowDashboard(true)}>Report</Link><br/>
-                <Link to="/endreport">End Report</Link>
               </div>
               <div className="speechBubble">
                 <h1 style={{ fontSize }}>{data.assistant}</h1>
@@ -157,9 +189,11 @@ function App() {
             </div>
           </div>
         } />
+        <Route path="/endreport" element={<EndPage/>}/>
       </Routes>
-    </Router>
   );
 }
 
 export default App;
+
+

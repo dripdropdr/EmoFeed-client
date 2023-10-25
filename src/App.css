@@ -217,3 +217,11 @@ body {
   opacity: 0;  /* 초기 상태 */
   animation: fadeInDashboardUp 1s ease-in-out forwards;
 }
+
+.emofeedlogo-main{
+  width: 10vw;       /* 화면 너비의 5% */
+  height: 10vh;      /* 화면 높이의 5% */  /* 스크롤에 상관없이 화면의 특정 위치에 고정 */
+  top: 1vh;         /* 화면 높이의 2%만큼 상단에서 떨어뜨림 */
+  left: 1vw;
+
+}

@@ -166,11 +166,12 @@ function App() {
           <div className="container">
             <div className="header">
               <div className="dataSection">
-                <h2>EmoFeed</h2>
+                <img src={process.env.PUBLIC_URL + 'images/emofeed-logo.svg'}  alt="Emofeed logo" className="emofeedlogo-main"/>
                 <p>Drowsiness: {data.drowsiness}</p>
                 <p>Confusion: {data.confusion}</p>
                 <p>{data.emotion1}: {data.emotion1_strength}</p>
                 <p>{data.emotion2}: {data.emotion2_strength}</p>
+                <Link to="/endreport">Finish the record</Link>
               </div>
               <div className="speechBubble">
                 <h1 style={{ fontSize }}>{data.assistant}</h1>

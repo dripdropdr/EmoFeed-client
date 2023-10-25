@@ -164,6 +164,7 @@ function Endreport() {
             drowsinessSeries.dataFields.dateX = "timestamp";
             drowsinessSeries.dataFields.valueY = "drowsiness";
             drowsinessSeries.name = "Drowsiness";
+            drowsinessSeries.hidden = true;
             drowsinessSeries.stroke = am4core.color("orange");
 
             // Create a series for Confusion
@@ -171,6 +172,7 @@ function Endreport() {
             confusionSeries.dataFields.dateX = "timestamp";
             confusionSeries.dataFields.valueY = "confusion";
             confusionSeries.name = "Confusion";
+            confusionSeries.hidden = true;
             confusionSeries.stroke = am4core.color("pink");
 
             // Create a series for Happiness
@@ -178,6 +180,7 @@ function Endreport() {
             happinessSeries.dataFields.dateX = "timestamp";
             happinessSeries.dataFields.valueY = "happiness";
             happinessSeries.name = "Happiness";
+            happinessSeries.hidden = true;
             happinessSeries.stroke = am4core.color("lightgreen");
 
             // Create a series for Surprise
@@ -185,10 +188,17 @@ function Endreport() {
             surpriseSeries.dataFields.dateX = "timestamp";
             surpriseSeries.dataFields.valueY = "surprise";
             surpriseSeries.name = "Surprise";
+            surpriseSeries.hidden = true;
             surpriseSeries.stroke = am4core.color("lightblue");
 
             // Add a legend
             lineChart.legend = new am4charts.Legend();
+            lineChart.legend.markers.template.disabled = false;
+
+            // Add chart labels
+            lineChart.cursor = new am4charts.XYCursor();
+            lineChart.cursor.xAxis = dateAxis; // Attach the cursor to the X-axis
+            lineChart.cursor.snapToSeries = [drowsinessSeries, confusionSeries, happinessSeries, surpriseSeries];
 
             // Enable the chart to use data from all series when creating the axis ranges
             lineChart.seriesContainer.multiZoom = true;

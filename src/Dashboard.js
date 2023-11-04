@@ -19,7 +19,7 @@ function Dashboard() {
 
         // x축 설정
         let dateAxis = x.xAxes.push(new am4charts.DateAxis());
-        dateAxis.renderer.grid.template.location = 0;
+        dateAxis.renderer.grid.template.location = 0; 
         dateAxis.title.text = "Time";
         dateAxis.keepSelection = true;
 

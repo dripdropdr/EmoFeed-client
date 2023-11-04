@@ -9,6 +9,8 @@ import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 
+
+
 function Endreport() {
     //const StatusEndpoint = "http://127.0.0.1:5000/status"
 
@@ -16,6 +18,7 @@ function Endreport() {
     const [totalPositive, setTotalPositive] = useState(0);
     const [totalNegative, setTotalNegative] = useState(0);
     const [statuses, setStatuses] = useState([]);
+
 
 
     // State and useEffect for fetching data
@@ -136,6 +139,9 @@ function Endreport() {
         }
     }, [statuses]);
 
+
+
+
     // Line chart
     useEffect(() => {
         if (statuses.length > 0) {
@@ -148,48 +154,58 @@ function Endreport() {
             let lineChart = lineChartContainer.createChild(am4charts.XYChart);
 
             // Add data to the chart using statuses
-            lineChart.data = statuses;
+            //lineChart.data = statuses;
+
+            // Convert Unix timestamps to JavaScript Date objects
+            const data = statuses.map(status => ({
+                ...status,
+                timestamp: new Date(status.timestamp * 1000)
+            }));
+
+            // Add data to the chart
+            lineChart.data = data;
+
 
             // Create date axis for the X-axis
             let dateAxis = lineChart.xAxes.push(new am4charts.DateAxis());
-            dateAxis.dataFields.category = "timestamp";
+            dateAxis.dataFields.date = "timestamp"
             dateAxis.renderer.grid.template.location = 0;
             dateAxis.dateFormats.setKey("second", "HH:mm:ss");
+            dateAxis.dateFormats.setKey("minute", "HH:mm:ss");
 
             // Create value axis for the Y-axis
             let valueAxis = lineChart.yAxes.push(new am4charts.ValueAxis());
 
-            // Create a series for Drowsiness
-            let drowsinessSeries = lineChart.series.push(new am4charts.LineSeries());
-            drowsinessSeries.dataFields.dateX = "timestamp";
-            drowsinessSeries.dataFields.valueY = "drowsiness";
-            drowsinessSeries.name = "Drowsiness";
-            drowsinessSeries.hidden = true;
-            drowsinessSeries.stroke = am4core.color("orange");
+            function createLineSeriesAndLabel(chart, dataFieldY, labelText, color, xOffset, seriesName) {
+                // Create a series for the emotion
+                let series = chart.series.push(new am4charts.LineSeries());
+                series.dataFields.dateX = "timestamp";
+                series.dataFields.valueY = dataFieldY;
+                series.name = seriesName; 
+                series.hidden = true;
+                series.stroke = am4core.color(color);
 
-            // Create a series for Confusion
-            let confusionSeries = lineChart.series.push(new am4charts.LineSeries());
-            confusionSeries.dataFields.dateX = "timestamp";
-            confusionSeries.dataFields.valueY = "confusion";
-            confusionSeries.name = "Confusion";
-            confusionSeries.hidden = true;
-            confusionSeries.stroke = am4core.color("pink");
+                // Create a label for the emotion
+                let label = series.createChild(am4core.Label);
+                label.text = labelText;
+                label.fill = am4core.color(color);
+                label.fontSize = 15;
+                label.dy = 10; // Adjust the label's vertical position
+                label.dx = xOffset; // Adjust the label's horizontal position
 
-            // Create a series for Happiness
-            let happinessSeries = lineChart.series.push(new am4charts.LineSeries());
-            happinessSeries.dataFields.dateX = "timestamp";
-            happinessSeries.dataFields.valueY = "happiness";
-            happinessSeries.name = "Happiness";
-            happinessSeries.hidden = true;
-            happinessSeries.stroke = am4core.color("lightgreen");
+                // Prevent the series name from hiding when clicked
+                series.events.on("hidden", function () {
+                    series.hide();
+                });
 
-            // Create a series for Surprise
-            let surpriseSeries = lineChart.series.push(new am4charts.LineSeries());
-            surpriseSeries.dataFields.dateX = "timestamp";
-            surpriseSeries.dataFields.valueY = "surprise";
-            surpriseSeries.name = "Surprise";
-            surpriseSeries.hidden = true;
-            surpriseSeries.stroke = am4core.color("lightblue");
+                return series;
+            }
+
+            // Create series and labels
+            let drowsinessSeries = createLineSeriesAndLabel(lineChart, "drowsiness", "Drowsiness", "orange", 0, "Drowsiness");
+            let confusionSeries = createLineSeriesAndLabel(lineChart, "confusion", "Confusion", "pink", 100, "Confusion");
+            let happinessSeries = createLineSeriesAndLabel(lineChart, "happiness", "Happiness", "lightgreen", 200, "Happiness");
+            let surpriseSeries = createLineSeriesAndLabel(lineChart, "surprise", "Surprise", "lightblue", 300, "Surprise");
 
             // Add a legend
             lineChart.legend = new am4charts.Legend();
@@ -198,6 +214,7 @@ function Endreport() {
             // Add chart labels
             lineChart.cursor = new am4charts.XYCursor();
             lineChart.cursor.xAxis = dateAxis; // Attach the cursor to the X-axis
+            lineChart.cursor.xAxis.tooltipDateFormat = "HH:mm:ss"; // 1초 단위로 툴팁에 표시될 형식을 설정합니다
             lineChart.cursor.snapToSeries = [drowsinessSeries, confusionSeries, happinessSeries, surpriseSeries];
 
             // Enable the chart to use data from all series when creating the axis ranges
@@ -214,20 +231,20 @@ function Endreport() {
 
     return (
         <Grid container justifyContent="center" alignItems="center" style={{ height: '100vh' }}>
-            <Grid item xs={8}> {/* md={8} lg={6} xl={4}*/}
+            <Grid item xs={9}> {/* md={8} lg={6} xl={4}*/}
                 <Paper sx={{ backgroundColor: 'black', padding: '20px', textAlign: 'center', color: 'white' }} elevation={3}>
                     <br />
-                    <Typography variant="h5">오늘 발표에서 청중이 느낀 감정은?</Typography>
+                    <Typography variant="h5" >오늘 발표에서 청중이 느낀 감정은?</Typography> {/*style={{ fontWeight: 'bold' }}*/}
                     <Typography variant="h4" style={{ color: 'blue', margin: '10px', marginBottom: '10px' }}>
                         긍정적: {Math.round((totalPositive / (totalPositive + totalNegative)) * 100)}%
                     </Typography>
                     <Typography variant="h4" style={{ color: 'red', margin: '10px' }}>
                         부정적: {Math.round((totalNegative / (totalPositive + totalNegative)) * 100)}%
                     </Typography>
-
+                    <br />
                     <br />
                     <Typography variant="h5">발표에서 각각 상태들은 얼마나 나왔을까?</Typography>
-                    <div id="emotion-chart" style={{ width: "100%", height: "320px" }}></div>
+                    <div id="emotion-chart" style={{ width: "100%", height: "350px" }}></div>
 
                     {/*amCharts를 통한 그래프 생성*/}
                     <Typography variant="h5" >인지 상태별 추이를 확인해보자</Typography>
@@ -236,7 +253,7 @@ function Endreport() {
                         <Button >긍정적</Button>
                         <Button>부정적</Button>
                     </ButtonGroup> */}{/* 다른 감정들도 버튼으로 추가 */}
-                    <div id="line-chart" style={{ width: "100%", height: "300px" }}></div>
+                    <div id="line-chart" style={{ width: "100%", height: "360px" }}></div>
                 </Paper>
             </Grid>
         </Grid>

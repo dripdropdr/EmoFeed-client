@@ -64,7 +64,7 @@ function Dashboard() {
         createSeries("drowsiness", "#FF00FF");
         //createSeries("neutral", "#888888");
         //createSeries("anger", "#FF0000");
-        //createSeries("disgust", "#00FF00");
+        createSeries("disgust", "#00FF00");
         //createSeries("fear", "#000000");
         createSeries("confusion", "#FF0000");
         createSeries("happiness", "#FFFF00");
@@ -114,24 +114,20 @@ function Dashboard() {
 
                         // 데이터 배열의 각 요소를 순회하며 newData 객체를 생성하고 newDataArray에 추가합니다.
                         data.forEach((item) => {
-
                             // timestamp 값을 Date 객체로 변환
                             //let dateObj = new Date(item.timestamp * 1000);
-
                             let newData = {
                                 date: new Date(item.timestamp * 1000),
-                                //anger: item.anger,
+                                anger: item.anger,
                                 confusion: item.confusion,
-                                //disgust: item.disgust,
+                                disgust: item.disgust,
                                 drowsiness: item.drowsiness,
-                                //fear: item.fear,
+                                fear: item.fear,
                                 happiness: item.happiness,
                                 //neutral: item.neutral,
-                                //sadness: item.sadness,
+                                sadness: item.sadness,
                                 surprise: item.surprise
-
                             };
-
                             newDataArray.push(newData); // newData를 newDataArray에 추가합니다.
                         });
 

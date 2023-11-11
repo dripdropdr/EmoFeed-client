@@ -2,47 +2,34 @@ import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import * as am4core from "@amcharts/amcharts4/core";
 import * as am4charts from "@amcharts/amcharts4/charts";
-import Button from '@mui/material/Button';
-import ButtonGroup from '@mui/material/ButtonGroup';
-import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
-import Paper from '@mui/material/Paper';
-import Grid from '@mui/material/Grid';
+import './Endreport.css';
 
 
 
 function Endreport() {
-    //const StatusEndpoint = "http://127.0.0.1:5000/status"
-
     // 상태 및 데이터를 초기화합니다
     const [totalPositive, setTotalPositive] = useState(0);
     const [totalNegative, setTotalNegative] = useState(0);
     const [statuses, setStatuses] = useState([]);
-
-
+    const [positivePop, setPositivePop] = useState(true);
+    const [negativePop, setNegativePop] = useState(false);
 
     // State and useEffect for fetching data
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const response = await axios.get("/status");
-
                 if (response.status === 200) {
                     const data = response.data;
                     const fetchedStatuses = data.statuses;
-
                     setStatuses(fetchedStatuses);
-
                     // Calculate total positive and total negative
                     const totalPos = fetchedStatuses.reduce(
-                        (acc, row) => acc + row.happiness + row.neutral,
-                        0
+                        (acc, row) => acc + row.happiness + row.neutral, 0
                     );
                     const totalNeg = fetchedStatuses.reduce(
-                        (acc, row) => acc + row.disgust, //+ row.sadness
-                        0
+                        (acc, row) => acc + row.disgust, 0
                     );
-
                     setTotalPositive(totalPos);
                     setTotalNegative(totalNeg);
                 }
@@ -50,9 +37,25 @@ function Endreport() {
                 console.error("Error fetching status data", error);
             }
         };
-
         fetchData();
     }, []);
+
+    const handlePositive = () => {
+        if (positivePop == true){
+            setPositivePop(false);
+        } else {
+            setPositivePop(true);
+        }
+    };
+
+    const handleNegative = () => {
+        if (negativePop == true){
+            setNegativePop(false);
+        } else {
+            setNegativePop(true);
+        }
+    };
+
 
     // Bar Chart
     useEffect(() => {
@@ -63,9 +66,13 @@ function Endreport() {
             const totalConfusion = statuses.reduce((acc, row) => acc + row.confusion, 0);
             const totalHappiness = statuses.reduce((acc, row) => acc + row.happiness, 0);
             const totalSurprise = statuses.reduce((acc, row) => acc + row.surprise, 0);
+            const totalDisgust = statuses.reduce((acc, row) => acc + row.disgust, 0);
+            const totalAnger = statuses.reduce((acc, row) => acc + row.anger, 0);
+            const totalSadness = statuses.reduce((acc, row) => acc + row.sadness, 0);
+            const totalNeutral = statuses.reduce((acc, row) => acc + row.neutral, 0);
 
             // Calculate the sum of all emotions
-            const totalEmotions = totalDrowsiness + totalConfusion + totalHappiness + totalSurprise;
+            const totalEmotions = totalDrowsiness + totalConfusion + totalHappiness + totalSurprise + totalAnger + totalDisgust + totalSadness + totalNeutral;
 
             // Create a container for the chart
             let chartContainer = am4core.create("emotion-chart", am4core.Container);
@@ -76,16 +83,6 @@ function Endreport() {
             let chart = chartContainer.createChild(am4charts.XYChart);
             chart.data = [
                 {
-                    emotion: "Drowsiness",
-                    value: Math.round(totalDrowsiness / totalEmotions * 100),
-                    color: "orange",
-                },
-                {
-                    emotion: "Confusion",
-                    value: Math.round(totalConfusion / totalEmotions * 100),
-                    color: "pink",
-                },
-                {
                     emotion: "Happiness",
                     value: Math.round(totalHappiness / totalEmotions * 100),
                     color: "lightgreen",
@@ -93,7 +90,27 @@ function Endreport() {
                 {
                     emotion: "Surprise",
                     value: Math.round(totalSurprise / totalEmotions * 100),
+                    color: "lightpink",
+                },
+                {
+                    emotion: "Anger",
+                    value: Math.round(totalAnger / totalEmotions * 100),
+                    color: "red",
+                },
+                {
+                    emotion: "Sadness",
+                    value: Math.round(totalSadness / totalEmotions * 100),
                     color: "lightblue",
+                },
+                {
+                    emotion: "Confusion",
+                    value: Math.round(totalConfusion / totalEmotions * 100),
+                    color: "lightgray",
+                },
+                {
+                    emotion: "Drowsiness",
+                    value: Math.round(totalDrowsiness / totalEmotions * 100),
+                    color: "blue",
                 },
             ];
 
@@ -153,10 +170,8 @@ function Endreport() {
 
             // Create a chart
             let lineChart = lineChartContainer.createChild(am4charts.XYChart);
-
             // Add data to the chart using statuses
             //lineChart.data = statuses;
-
             // Convert Unix timestamps to JavaScript Date objects
             const data = statuses.map(status => ({
                 ...status,
@@ -191,8 +206,8 @@ function Endreport() {
                 label.text = labelText;
                 label.fill = am4core.color(color);
                 label.fontSize = 15;
-                label.dy = 10; // Adjust the label's vertical position
-                label.dx = xOffset; // Adjust the label's horizontal position
+                label.dy = -10; // Adjust the label's vertical position
+                label.dx = xOffset + 320; // Adjust the label's horizontal position
 
                 // Prevent the series name from hiding when clicked
                 series.events.on("hidden", function () {
@@ -203,10 +218,12 @@ function Endreport() {
             }
 
             // Create series and labels
-            let drowsinessSeries = createLineSeriesAndLabel(lineChart, "drowsiness", "Drowsiness", "orange", 0, "Drowsiness");
-            let confusionSeries = createLineSeriesAndLabel(lineChart, "confusion", "Confusion", "pink", 100, "Confusion");
+            let drowsinessSeries = createLineSeriesAndLabel(lineChart, "drowsiness", "Drowsiness", "blue", 0, "Drowsiness");
+            let confusionSeries = createLineSeriesAndLabel(lineChart, "confusion", "Confusion", "lightgray", 100, "Confusion");
             let happinessSeries = createLineSeriesAndLabel(lineChart, "happiness", "Happiness", "lightgreen", 200, "Happiness");
-            let surpriseSeries = createLineSeriesAndLabel(lineChart, "surprise", "Surprise", "lightblue", 300, "Surprise");
+            let surpriseSeries = createLineSeriesAndLabel(lineChart, "surprise", "Surprise", "lightpink", 300, "Surprise");
+            let angerSeries = createLineSeriesAndLabel(lineChart, "anger", "Anger", "red", 385, "Anger");
+            let sadnessSeries = createLineSeriesAndLabel(lineChart, "sadness", "Sadness", "lightblue", 450, "Sadness");
 
             // Add a legend
             lineChart.legend = new am4charts.Legend();
@@ -216,7 +233,7 @@ function Endreport() {
             lineChart.cursor = new am4charts.XYCursor();
             lineChart.cursor.xAxis = dateAxis; // Attach the cursor to the X-axis
             lineChart.cursor.xAxis.tooltipDateFormat = "HH:mm:ss"; // 1초 단위로 툴팁에 표시될 형식을 설정합니다
-            lineChart.cursor.snapToSeries = [drowsinessSeries, confusionSeries, happinessSeries, surpriseSeries];
+            lineChart.cursor.snapToSeries = [happinessSeries, surpriseSeries, angerSeries, sadnessSeries, confusionSeries, drowsinessSeries,];
 
             // Enable the chart to use data from all series when creating the axis ranges
             lineChart.seriesContainer.multiZoom = true;
@@ -231,207 +248,32 @@ function Endreport() {
 
 
     return (
-        <Grid container justifyContent="center" alignItems="center" style={{ height: '100vh' }}>
-            <Grid item xs={9}> {/* md={8} lg={6} xl={4}*/}
-                <Paper sx={{ backgroundColor: 'black', padding: '20px', textAlign: 'center', color: 'white' }} elevation={3}>
-                    <br />
-                    <Typography variant="h5" >오늘 발표에서 청중이 느낀 감정은?</Typography> {/*style={{ fontWeight: 'bold' }}*/}
-                    <Typography variant="h4" style={{ color: 'blue', margin: '10px', marginBottom: '10px' }}>
-                        긍정적: {Math.round((totalPositive / (totalPositive + totalNegative)) * 100)}%
-                    </Typography>
-                    <Typography variant="h4" style={{ color: 'red', margin: '10px' }}>
-                        부정적: {Math.round((totalNegative / (totalPositive + totalNegative)) * 100)}%
-                    </Typography>
-                    <br />
-                    <br />
-                    <Typography variant="h5">발표에서 각각 상태들은 얼마나 나왔을까?</Typography>
-                    <div id="emotion-chart" style={{ width: "100%", height: "350px" }}></div>
-
-                    {/*amCharts를 통한 그래프 생성*/}
-                    <Typography variant="h5" >인지 상태별 추이를 확인해보자</Typography>
-                    <br />
-                    {/* <ButtonGroup>
-                        <Button >긍정적</Button>
-                        <Button>부정적</Button>
-                    </ButtonGroup> */}{/* 다른 감정들도 버튼으로 추가 */}
-                    <div id="line-chart" style={{ width: "100%", height: "360px" }}></div>
-                </Paper>
-            </Grid>
-        </Grid>
+        <div className="container">
+            <div className="paper">
+                <br />
+                <div className='barchartContainer'>
+                    <p className="title">How was their Feeling?</p>
+                    <div id="emotion-chart" className="chart"></div> {/*amCharts를 통한 그래프 생성*/}
+                    <span className="emotion-positive" onClick={handlePositive}>
+                        Positive: {Math.round((totalPositive / (totalPositive + totalNegative)) * 100)}%
+                    </span>
+                    <span className="emotion-negative" onClick={handleNegative}>
+                        Negative: {Math.round((totalNegative / (totalPositive + totalNegative)) * 100)}%
+                    </span>
+                </div>
+                <br />
+                <br />
+                <p className="title">Time-series Feedback</p>
+                <br />
+                <div id="line-chart" className="line-chart"></div>
+                <br />
+                <br /><br />
+                <br />
+            </div>
+        </div>
     );
 
 
 }
 
 export default Endreport;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// function Endreport() {
-//     const StatusEndpoint = "http://127.0.0.1:5000/status";
-//     const chartRef = useRef(null);
-//     const [chart, setChart] = useState(null);
-//     const [emotionsVisibility, setEmotionsVisibility] = useState({
-//         drowsiness: true,
-//         confusion: true,
-//         happiness: false,
-//         surprise: false,
-//         anger: false,
-//         fear: false,
-//         disgust: false,
-//         sadness: false
-//     });
-
-//     useEffect(() => {
-//         if (!chartRef.current) return;
-
-//         const chart = am4core.create(chartRef.current, am4charts.XYChart);
-//         chart.paddingTop = 40;
-//         chart.paddingRight = 10;
-//         chart.paddingBottom = 10;
-//         chart.paddingLeft = 10;
-//         chart.background.fill = am4core.color("#000");
-
-
-//         // Create the X axis for the chart
-//         const dateAxis = chart.xAxes.push(new am4charts.DateAxis());
-//         dateAxis.renderer.grid.template.location = 0;
-//         dateAxis.renderer.labels.template.fill = am4core.color("#ffffff");
-//         dateAxis.renderer.grid.template.stroke = am4core.color("#ffffff");
-
-//         // Create the Y axis for the chart
-//         const valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
-//         valueAxis.min = 0;
-//         valueAxis.max = 1;
-//         valueAxis.renderer.labels.template.fill = am4core.color("#ffffff");
-//         valueAxis.renderer.grid.template.stroke = am4core.color("#ffffff");
-
-//         function createSeries(name, title, lineColor) {
-//             const series = chart.series.push(new am4charts.LineSeries());
-//             series.dataFields.dateX = "timestamp";
-//             series.dataFields.valueY = name;
-//             series.name = title;
-//             series.stroke = am4core.color(lineColor);
-//             series.strokeWidth = 2;
-//             series.fillOpacity = 0.2;
-
-
-//             // 제목 추가
-//             const titleDiv = chart.chartContainer.createChild(am4core.Label);
-//             titleDiv.text = title;
-//             titleDiv.fontSize = 16;
-//             titleDiv.align = "center";
-//             titleDiv.isMeasured = false;
-//             titleDiv.x = am4core.percent(50);
-//             titleDiv.dy = -30;
-//             titleDiv.fill = am4core.color("#000");
-//             titleDiv.fontWeight = "bold";
-
-//             // Additional part to handle visibility
-//             if (emotionsVisibility[name]) {
-//                 series.hiddenInLegend = true;
-//                 series.hidden = true;
-//             }
-
-//             return series;
-//         }
-
-
-//         // 감정에 대한 시리즈 생성
-//         createSeries("drowsiness", "Drowsiness", "#00FFFF"); // Drowsiness (하늘색)
-//         createSeries("confusion", "Confusion", "#FF0000"); // Confusion (빨간색)
-//         createSeries("happiness", "Happiness", "#00FF00"); // Happiness (초록색)
-//         createSeries("surprise", "Surprise", "#FFA500"); // Surprise (주황색)
-//         createSeries("anger", "Anger", "#FF4500"); // Anger (주황빛 붉은색)
-//         createSeries("fear", "Fear", "#800080"); // Fear (보라색)
-//         createSeries("disgust", "Disgust", "#008000"); // Disgust (진한 초록색)
-//         createSeries("sadness", "Sadness", "#0000FF"); // Sadness (파란색)
-
-//         setChart(chart);
-
-//         return () => {
-//             chart.dispose();
-//         };
-//     }, []);
-
-//     useEffect(() => {
-//         if (chart) {
-//             const fetchData = async () => {
-//                 try {
-//                     const response = await axios.get(StatusEndpoint);
-//                     if (response.status === 200) {
-//                         const data = response.data;
-
-//                         // 감정 데이터 구성
-//                         const emotionsData = data.map(item => ({
-//                             timestamp: new Date(item.timestamp * 1000),
-//                             drowsiness: item.drowsiness,
-//                             confusion: item.confusion,
-//                             happiness: item.happiness,
-//                             surprise: item.surprise,
-//                             anger: item.anger,
-//                             fear: item.fear,
-//                             disgust: item.disgust,
-//                             sadness: item.sadness
-//                         }));
-
-//                         chart.data = emotionsData;
-//                     }
-//                 } catch (error) {
-//                     console.error("Error fetching the status data", error);
-//                 }
-//             };
-
-//             fetchData();
-//         }
-//     }, [chart]);
-
-//     // Additional part to handle button clicks
-//     function handleButtonClick(e) {
-//         //        e.preventDefault();
-
-//         const emotionName = e.target.name;
-
-//         setEmotionsVisibility(prevVisibility => ({
-//             ...prevVisibility,
-//             [emotionName]: !prevVisibility[emotionName]
-//         }));
-
-//         const selectedGraph = chart.series.values.find((series) => series.name === emotionName);
-
-//         if (selectedGraph) {
-//             // 그래프의 가시성 조정
-//             selectedGraph.hidden = !selectedGraph.hidden;
-
-//             // 레전드 항목의 가시성 조정
-//             selectedGraph.hiddenInLegend = selectedGraph.hidden;
-//         }
-//     }
-
-//     return (
-//         <div>
-//             <div id="chartdiv" ref={chartRef} style={{ width: "100%", height: "500px" }} />
-//             {Object.keys(emotionsVisibility).map((emotion) => (
-//                 <button key={emotion} name={emotion} onClick={handleButtonClick}>
-//                     {emotionsVisibility[emotion] ? 'Hide' : 'Show'} {emotion}
-//                 </button>
-//             ))}
-//         </div>
-//     );
-// }
-
-// export default Endreport;

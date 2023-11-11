@@ -1,19 +1,55 @@
 import { useEffect, useState, useRef } from 'react';
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Link, useNavigate, useLocation } from 'react-router-dom'; // Switch를 Routes로 바꿈
-import Dashboard from './Dashboard';
 import Endreport from './Endreport';
 import './App.css';
 
 function IntroPage() {
   const navigate = useNavigate();
   const [animateOut, setAnimateOut] = useState(false);
+  const initialCheckboxes = [
+    { key: 'happiness', checked: false },
+    { key: 'surprise', checked: false },
+    { key: 'anger', checked: false },
+    { key: 'sadness', checked: false },
+    { key: 'confusion', checked: false },
+  ];
+  const [checkboxes, setCheckboxes] = useState(initialCheckboxes);
 
-  const handleProceedClick = () => {
+  const handleProceedClick = async () => {
+    const response = await fetch('/preferredStatus', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ checkboxes }),
+    });
+
+    const data = await response.json();
+    console.log(data);  // 서버 응답 처리
     setAnimateOut(true);
     setTimeout(() => {
         navigate("/main");
     }, 1000);  // 애니메이션 지속 시간과 일치해야 합니다.
+  };
+
+  const handleCheckboxChange = (index) => {
+    // 현재 체크된 체크박스의 수 계산
+    const checkedCount = checkboxes.filter(cb => cb.checked).length;
+    // 클릭된 체크박스의 현재 상태
+    const isCurrentlyChecked = checkboxes[index].checked;
+    // 이미 2개가 체크되어 있고, 클릭된 체크박스가 체크되지 않았을 경우 추가 선택 방지
+    if (checkedCount >= 1 && !isCurrentlyChecked) return;
+
+    // 체크박스 상태 업데이트
+    const newCheckboxes = checkboxes.map((item, idx) => {
+      if (idx === index) {
+        return { ...item, checked: !item.checked };
+      }
+      return item;
+    });
+
+    setCheckboxes(newCheckboxes);
   };
 
   return (
@@ -23,6 +59,20 @@ function IntroPage() {
           <source src={process.env.PUBLIC_URL + "/videos/happiness-low.mp4"} type="video/mp4" />
           Your browser does not support the video tag.
         </video>
+        <div className='checkboxesContainer'>
+          <p>Check your "single preferred" emotion</p>
+          {checkboxes.map((checkbox, index) => (
+            <div key={checkbox.key}>
+              <input
+                id={checkbox.key}
+                type="checkbox"
+                checked={checkbox.checked}
+                onChange={() => handleCheckboxChange(index)}
+              />
+              <label htmlFor={checkbox.key}>{checkbox.key}</label>
+            </div>
+          ))}
+        </div>
         <img src={process.env.PUBLIC_URL + 'images/emofeed-start.svg'} onClick={handleProceedClick} alt="Shall we start" className="emofeedstart" />
     </div>
   );
@@ -42,8 +92,9 @@ function EndPage() {
 
   return (
     <div className={`endContainer ${animateOut ? 'animateOut' : ''}`}>
-        <h1>Thank you for using EmoFeed!</h1>
-        <button onClick={handleProceedClick}>Go to Main</button>
+        <div className='buttonContainer'>
+          <button onClick={handleProceedClick} className='gotoMainBtn'>Go to Main?</button>
+        </div>
 
         {/* Dashboard 컴포넌트 추가 */}
         <div className={showDashboard ? 'dashboard-visible' : 'dashboard-hidden'}>
@@ -63,7 +114,7 @@ function App() {
   const [showDashboard, setShowDashboard] = useState(false);
   const [data, setData] = useState({ drowsiness: null, emotion1: null, emotion1_strength: null, emotion2: null, emotion2_strength: null, assistant:null});
   // 'neutral', 'anger', 'disgust', 'fear', 'happiness', 'sadness', 'surprise'
-  const [fontSize, setFontSize] = useState('1em');
+  const [fontSize, setFontSize] = useState('20px');
   const location = useLocation();
 
 
@@ -166,18 +217,17 @@ function App() {
           <div className="container">
             <div className="header">
               <div className="dataSection">
-                <img src={process.env.PUBLIC_URL + 'images/emofeed-logo.svg'}  alt="Emofeed logo" className="emofeedlogo-main"/>
+                {/* <img src={process.env.PUBLIC_URL + 'images/emofeed-logo.svg'}  alt="Emofeed logo" className="emofeedlogo-main"/>
                 <p>Drowsiness: {data.drowsiness}</p>
                 <p>Confusion: {data.confusion}</p>
                 <p>{data.emotion1}: {data.emotion1_strength}</p>
-                <p>{data.emotion2}: {data.emotion2_strength}</p>
-                <Link to="/endreport">Finish the record</Link>
+                <p>{data.emotion2}: {data.emotion2_strength}</p> */}
               </div>
               <div className="speechBubble">
-                <h1 style={{ fontSize }}>{data.assistant}</h1>
+                <span style={{ fontSize }}>{data.assistant}</span>
               </div>
               <div className="videoSection">
-                <video width="240" height="180" muted autoPlay>
+                <video muted autoPlay>
                   <source src={process.env.PUBLIC_URL + getVideoUrl(data)} type="video/mp4" />
                   Your browser does not support the video tag.
                 </video>
@@ -187,6 +237,9 @@ function App() {
               <div className="videoContainer">
                 <img src={flaskEndpoint} alt="Webcam Stream" className="webcamStream" />
               </div>
+            </div>
+            <div className='endreportContainer'>
+              <Link to="/endreport" className='endreportBtn'>Finish?</Link>
             </div>
           </div>
         } />

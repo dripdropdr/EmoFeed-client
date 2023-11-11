@@ -72,7 +72,7 @@ body {
 }
 
 .speechBubble {
-  background: #bc9300;
+  background: #b0b0b095;
   border-radius: 15px;
   width: 400px;
   max-height: 100px;
@@ -86,8 +86,9 @@ body {
   padding: 20px;
   /* 패딩 추가하여 텍스트와 테두리 간의 여백 생성 */
   flex-wrap: wrap;
+  z-index: 10;
   /* 텍스트가 많아지면 자동으로 줄 바꿈되게 설정 */
-  overflow: auto;
+  /* overflow: auto; */
 }
 
 .speechBubble:after {
@@ -98,10 +99,11 @@ body {
   width: 0;
   height: 0;
   border: 16px solid transparent;
-  border-left-color: #bc9300;
+  border-left-color: #b0b0b095;
   border-right: 0;
   margin-top: -16px;
   margin-right: -16px;
+  z-index: 10;
 }
 
 .videoSection {
@@ -110,7 +112,14 @@ body {
   right: 20px;
   width: 200px;
   height: 150px;
-  overflow: hidden;
+  /* overflow: hidden; */
+}
+
+.videoSection > video{
+  margin-right: 30px;
+  margin-left: -50px;
+  width: 150%;
+  height: 150%;
 }
 
 .middleSection {
@@ -142,7 +151,7 @@ body {
   align-items: center;
   justify-content: center;
   position: absolute;
-  top: 50%;
+  top: 43%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
@@ -164,7 +173,7 @@ body {
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  width: 200%;
+  width: 150%;
   /* 애니메이션 설정 */
   animation: fadeInUp 1s ease forwards;
   /* 초기 상태: 약간 아래로 이동 */
@@ -184,11 +193,12 @@ body {
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  width: 50%;
+  width: 40%;
   /* 애니메이션 설정 */
   animation: fadeInUp 1.2s ease forwards;
   /* 초기 상태: 약간 아래로 이동 */
   transform: translateY(20px);
+  margin-bottom: 30px;
 }
 
 .emofeedstart{
@@ -213,6 +223,15 @@ body {
   }
 }
 
+.checkboxesContainer{
+  margin-bottom: 10px;
+}
+
+.checkboxesContainer > div{
+  padding-left: 30%;
+}
+
+
 .endContainer {
   opacity: 0;  /* 초기 상태 */
   animation: fadeInDashboardUp 1s ease-in-out forwards;
@@ -224,4 +243,69 @@ body {
   top: 1vh;         /* 화면 높이의 2%만큼 상단에서 떨어뜨림 */
   left: 1vw;
 
+}
+
+.buttonContainer{
+  margin: 30px;
+  text-align: center;
+}
+
+.gotoMainBtn{
+  background-color: #fff;
+  border: 1px solid #d5d9d9;
+  border-radius: 8px;
+  box-shadow: rgba(213, 217, 217, .5) 0 2px 5px 0;
+  box-sizing: border-box;
+  color: #0f1111;
+  cursor: pointer;
+  display: inline-block;
+  font-family: "Amazon Ember",sans-serif;
+  font-size: 13px;
+  line-height: 29px;
+  padding: 0 10px 0 11px;
+  position: relative;
+  text-align: center;
+  text-decoration: none;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  vertical-align: middle;
+  width: 100px;
+}
+
+.gotoMainBtn:hover {
+  background-color: #f7fafa;
+}
+
+.gotoMainBtn:focus {
+  border-color: #008296;
+  box-shadow: rgba(213, 217, 217, .5) 0 2px 5px 0;
+  outline: 0;
+}
+
+.endreportContainer{
+  margin: 30px;
+}
+
+.endreportBtn{
+  background-color: #fff;
+  border: 1px solid #d5d9d9;
+  border-radius: 8px;
+  box-shadow: rgba(213, 217, 217, .5) 0 2px 5px 0;
+  box-sizing: border-box;
+  color: #0f1111;
+  cursor: pointer;
+  display: inline-block;
+  font-family: "Amazon Ember",sans-serif;
+  font-size: 20px;
+  line-height: 32px;
+  padding: 0 10px 0 11px;
+  position: relative;
+  text-align: center;
+  text-decoration: none;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  vertical-align: middle;
+  width: 120px;
 }

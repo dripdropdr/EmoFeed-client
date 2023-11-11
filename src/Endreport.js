@@ -22,7 +22,7 @@ function Endreport() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get("http://127.0.0.1:5000/status");
+                const response = await axios.get("/status");
 
                 if (response.status === 200) {
                     const data = response.data;
@@ -53,6 +53,7 @@ function Endreport() {
 
     // Bar Chart
     useEffect(() => {
+        console.log(statuses)
         if (statuses.length > 0) {
             // Calculate specific emotion values based on statuses
             const totalDrowsiness = statuses.reduce((acc, row) => acc + row.drowsiness, 0);

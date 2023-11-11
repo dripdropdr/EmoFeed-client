@@ -7,7 +7,7 @@
     "@amcharts/amcharts4": "^4.10.38",
     "@amcharts/amcharts5": "^5.4.8",
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
-    "@mui/icons-material": "^5.14.14",
+    "@mui/icons-material": "^5.14.15",
     "@mui/material": "^5.14.14",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",

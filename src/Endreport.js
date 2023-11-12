@@ -11,8 +11,6 @@ function Endreport() {
     const [totalPositive, setTotalPositive] = useState(0);
     const [totalNegative, setTotalNegative] = useState(0);
     const [statuses, setStatuses] = useState([]);
-    const [positivePop, setPositivePop] = useState(true);
-    const [negativePop, setNegativePop] = useState(false);
 
     // State and useEffect for fetching data
     useEffect(() => {
@@ -39,23 +37,6 @@ function Endreport() {
         };
         fetchData();
     }, []);
-
-    const handlePositive = () => {
-        if (positivePop == true){
-            setPositivePop(false);
-        } else {
-            setPositivePop(true);
-        }
-    };
-
-    const handleNegative = () => {
-        if (negativePop == true){
-            setNegativePop(false);
-        } else {
-            setNegativePop(true);
-        }
-    };
-
 
     // Bar Chart
     useEffect(() => {
@@ -170,32 +151,48 @@ function Endreport() {
 
             // Create a chart
             let lineChart = lineChartContainer.createChild(am4charts.XYChart);
-            // Add data to the chart using statuses
-            //lineChart.data = statuses;
             // Convert Unix timestamps to JavaScript Date objects
-            const data = statuses.map(status => ({
+            // const data = statuses.map(status => ({
+            //     ...status,
+            //     timestamp: new Date(status.timestamp * 1000)
+            // }));
+            const data = statuses.map((status, index) => ({
                 ...status,
-                timestamp: new Date(status.timestamp * 1000)
+                timestamp: new Date(status.timestamp * 1000),
+                elapsedTime: index * 4 // Set elapsedTime as the index multiplied by 4
             }));
 
             // Add data to the chart
             lineChart.data = data;
 
 
-            // Create date axis for the X-axis
-            let dateAxis = lineChart.xAxes.push(new am4charts.DateAxis());
-            dateAxis.dataFields.date = "timestamp"
-            dateAxis.renderer.grid.template.location = 0;
-            dateAxis.dateFormats.setKey("second", "HH:mm:ss");
-            dateAxis.dateFormats.setKey("minute", "HH:mm:ss");
+            // // Create date axis for the X-axis
+            // let dateAxis = lineChart.xAxes.push(new am4charts.DateAxis());
+            // dateAxis.dataFields.date = "timestamp"
+            // dateAxis.renderer.grid.template.location = 0;
+            // dateAxis.dateFormats.setKey("second", "HH:mm:ss");
+            // dateAxis.dateFormats.setKey("minute", "HH:mm:ss");
+            let durationAxis = lineChart.xAxes.push(new am4charts.DurationAxis());
+            durationAxis.renderer.minGridDistance = 50; // Set minimum grid distance to avoid overlapping labels
+            durationAxis.baseUnit = "second";
+            
+            // Set formatter for x-axis labels
+            durationAxis.renderer.labels.template.adapter.add("text", (text, target) => {
+                let value = target.position;
+                let minutes = Math.floor(value / 60);
+                let seconds = Math.floor(value % 60);
 
-            // Create value axis for the Y-axis
-            let valueAxis = lineChart.yAxes.push(new am4charts.ValueAxis());
+                return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            });
+
+            // // Create value axis for the Y-axis
+            // let valueAxis = lineChart.yAxes.push(new am4charts.ValueAxis());
 
             function createLineSeriesAndLabel(chart, dataFieldY, labelText, color, xOffset, seriesName) {
                 // Create a series for the emotion
                 let series = chart.series.push(new am4charts.LineSeries());
-                series.dataFields.dateX = "timestamp";
+                // series.dataFields.dateX = "timestamp";
+                series.dataFields.valueX = "elapsedTime";
                 series.dataFields.valueY = dataFieldY;
                 series.name = seriesName; 
                 series.hidden = true;
@@ -231,8 +228,9 @@ function Endreport() {
 
             // Add chart labels
             lineChart.cursor = new am4charts.XYCursor();
-            lineChart.cursor.xAxis = dateAxis; // Attach the cursor to the X-axis
-            lineChart.cursor.xAxis.tooltipDateFormat = "HH:mm:ss"; // 1초 단위로 툴팁에 표시될 형식을 설정합니다
+            // lineChart.cursor.xAxis = dateAxis; // Attach the cursor to the X-axis
+            // lineChart.cursor.xAxis.tooltipDateFormat = "HH:mm:ss"; // 1초 단위로 툴팁에 표시될 형식을 설정합니다
+            lineChart.cursor.xAxis = durationAxis;
             lineChart.cursor.snapToSeries = [happinessSeries, surpriseSeries, angerSeries, sadnessSeries, confusionSeries, drowsinessSeries,];
 
             // Enable the chart to use data from all series when creating the axis ranges
@@ -254,10 +252,10 @@ function Endreport() {
                 <div className='barchartContainer'>
                     <p className="title">How was their Feeling?</p>
                     <div id="emotion-chart" className="chart"></div> {/*amCharts를 통한 그래프 생성*/}
-                    <span className="emotion-positive" onClick={handlePositive}>
+                    <span className="emotion-positive">
                         Positive: {Math.round((totalPositive / (totalPositive + totalNegative)) * 100)}%
                     </span>
-                    <span className="emotion-negative" onClick={handleNegative}>
+                    <span className="emotion-negative">
                         Negative: {Math.round((totalNegative / (totalPositive + totalNegative)) * 100)}%
                     </span>
                 </div>
